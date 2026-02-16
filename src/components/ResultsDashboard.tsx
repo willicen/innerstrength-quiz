@@ -220,37 +220,12 @@ const ResultsDashboard = ({ answers, onRestart }: ResultsDashboardProps) => {
           </motion.p>
         </motion.div>
 
-        {/* CTA Section */}
-        <motion.div
-          variants={itemVariants}
-          className="glass-card p-8 md:p-10 text-center"
-        >
-          <h3 className="text-2xl font-display font-semibold text-foreground mb-3">
-            开启你的自我重建之旅
-          </h3>
-          <p className="text-muted-foreground font-serif mb-8 max-w-xl mx-auto">
-            获取专业的情感指导和个性化的自愈计划，让专业顾问陪伴你走过这段旅程
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <Button
-                size="lg"
-                className={`px-8 py-6 text-base rounded-xl ${styles.button} shadow-lg hover:shadow-xl transition-all`}
-              >
-                {getCtaIcon()}
-                {tier.cta_text}
-              </Button>
-            </motion.div>
-          </div>
-
+        {/* Restart */}
+        <motion.div variants={itemVariants} className="text-center mt-8">
           <motion.button
             onClick={onRestart}
             whileHover={{ scale: 1.02 }}
-            className="mt-6 text-sm text-muted-foreground hover:text-foreground transition-colors underline underline-offset-4"
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors underline underline-offset-4"
           >
             重新测评
           </motion.button>
