@@ -1,18 +1,28 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Heart, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import CodeEntryDialog from "./CodeEntryDialog";
 
 interface HeroSectionProps {
   onStartQuiz: () => void;
 }
 
 const HeroSection = ({ onStartQuiz }: HeroSectionProps) => {
+  const [dialogOpen, setDialogOpen] = useState(false);
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden px-4 py-20">
       {/* Decorative background elements */}
       <div className="blur-circle w-96 h-96 bg-primary/20 -top-48 -right-48" />
       <div className="blur-circle w-80 h-80 bg-accent/25 -bottom-40 -left-40" />
       <div className="blur-circle w-64 h-64 bg-lavender/30 top-1/3 right-1/4" />
+
+      {/* Top-left brand logo */}
+      <div className="absolute top-6 left-6 z-20 flex items-center gap-2">
+        <Heart className="w-6 h-6 text-primary fill-primary/30" />
+        <span className="text-lg font-display font-semibold text-foreground">东亮情感陪伴</span>
+      </div>
 
       <div className="relative z-10 max-w-3xl mx-auto text-center">
         {/* Brand badge */}
@@ -66,12 +76,12 @@ const HeroSection = ({ onStartQuiz }: HeroSectionProps) => {
           transition={{ duration: 0.7, delay: 0.4 }}
         >
           <Button
-            onClick={onStartQuiz}
+            onClick={() => setDialogOpen(true)}
             size="lg"
             className="group relative px-8 py-6 text-lg font-medium rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
           >
             <Sparkles className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" />
-            开始测评
+            开始探索内在力量
           </Button>
         </motion.div>
 
@@ -96,6 +106,13 @@ const HeroSection = ({ onStartQuiz }: HeroSectionProps) => {
           </div>
         </motion.div>
       </div>
+
+      {/* Code Entry Dialog */}
+      <CodeEntryDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onVerified={onStartQuiz}
+      />
     </section>
   );
 };
