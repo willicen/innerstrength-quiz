@@ -49,18 +49,6 @@ const Index = () => {
           </motion.div>
         )}
 
-        {stage === "verify" && (
-          <motion.div
-            key="verify"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <CodeEntryScreen onVerified={handleVerified} onBack={handleBackToHero} />
-          </motion.div>
-        )}
-
         {stage === "quiz" && (
           <motion.div
             key="quiz"
