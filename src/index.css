@@ -17,8 +17,8 @@
     --popover: 38 40% 98%;
     --popover-foreground: 25 20% 20%;
 
-    /* Sage green - healing, nature, growth */
-    --primary: 145 25% 42%;
+    /* Sage green #B2AC88 - healing, nature, growth */
+    --primary: 51 22% 62%;
     --primary-foreground: 40 30% 98%;
 
     /* Soft sand secondary */
@@ -29,8 +29,8 @@
     --muted: 35 20% 92%;
     --muted-foreground: 25 15% 45%;
 
-    /* Soft terracotta accent - warmth & comfort */
-    --accent: 15 45% 65%;
+    /* Soft terracotta #D6AD94 - warmth & comfort */
+    --accent: 23 44% 71%;
     --accent-foreground: 40 30% 98%;
 
     /* Gentle coral for highlights */
@@ -46,7 +46,7 @@
 
     --border: 35 25% 88%;
     --input: 35 25% 88%;
-    --ring: 145 25% 42%;
+    --ring: 51 22% 62%;
 
     --radius: 1rem;
 
@@ -68,12 +68,12 @@
 
     --sidebar-background: 35 30% 96%;
     --sidebar-foreground: 25 20% 25%;
-    --sidebar-primary: 145 25% 42%;
+    --sidebar-primary: 51 22% 62%;
     --sidebar-primary-foreground: 40 30% 98%;
     --sidebar-accent: 35 25% 90%;
     --sidebar-accent-foreground: 25 20% 25%;
     --sidebar-border: 35 25% 88%;
-    --sidebar-ring: 145 25% 42%;
+    --sidebar-ring: 51 22% 62%;
   }
 
   .dark {
@@ -86,7 +86,7 @@
     --popover: 25 15% 15%;
     --popover-foreground: 35 25% 92%;
 
-    --primary: 145 30% 55%;
+    --primary: 51 28% 55%;
     --primary-foreground: 25 15% 10%;
 
     --secondary: 25 12% 22%;
@@ -95,7 +95,7 @@
     --muted: 25 12% 20%;
     --muted-foreground: 35 15% 60%;
 
-    --accent: 15 40% 55%;
+    --accent: 23 40% 60%;
     --accent-foreground: 35 25% 95%;
 
     --highlight: 12 45% 60%;
@@ -109,16 +109,16 @@
 
     --border: 25 12% 22%;
     --input: 25 12% 22%;
-    --ring: 145 30% 55%;
+    --ring: 51 28% 55%;
 
     --sidebar-background: 25 15% 12%;
     --sidebar-foreground: 35 25% 90%;
-    --sidebar-primary: 145 30% 55%;
+    --sidebar-primary: 51 28% 55%;
     --sidebar-primary-foreground: 25 15% 10%;
     --sidebar-accent: 25 12% 20%;
     --sidebar-accent-foreground: 35 25% 90%;
     --sidebar-border: 25 12% 22%;
-    --sidebar-ring: 145 30% 55%;
+    --sidebar-ring: 51 28% 55%;
   }
 }
 
