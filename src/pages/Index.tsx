@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import HeroSection from "@/components/HeroSection";
-import HeroSection from "@/components/HeroSection";
 import QuizInterface from "@/components/QuizInterface";
 import AnalyzingLoader from "@/components/AnalyzingLoader";
 import ResultsDashboard from "@/components/ResultsDashboard";
