@@ -6,17 +6,13 @@ import QuizInterface from "@/components/QuizInterface";
 import AnalyzingLoader from "@/components/AnalyzingLoader";
 import ResultsDashboard from "@/components/ResultsDashboard";
 
-type Stage = "hero" | "verify" | "quiz" | "analyzing" | "results";
+type Stage = "hero" | "quiz" | "analyzing" | "results";
 
 const Index = () => {
   const [stage, setStage] = useState<Stage>("hero");
   const [answers, setAnswers] = useState<Record<number, number>>({});
 
   const handleStartQuiz = () => {
-    setStage("verify");
-  };
-
-  const handleVerified = () => {
     setStage("quiz");
   };
 
