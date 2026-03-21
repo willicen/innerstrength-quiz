@@ -1,126 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import React, { useState } from 'react';
 
-// 初始化 Supabase
-const supabaseUrl = 'https://uyqesonjopqgzwtxkchy.supabase.co';
-const supabaseKey = 'sb_publishable_M24zTkBimY0uhwL7d7S2MQ_zMWbSUSX';
-const supabase = createClient(supabaseUrl, supabaseKey);
-
-const questions = [
-  {
-    id: 1,
-    q: "你是否经常反复查看前任的社交媒体动态？",
-    q_en: "Do you frequently check your ex's social media updates?",
-    options: [
-      { text: "总是 (Always)", score: 4 },
-      { text: "经常 (Often)", score: 3 },
-      { text: "偶尔 (Sometimes)", score: 2 },
-      { text: "从不 (Never)", score: 1 }
-    ]
-  },
-  {
-    id: 2,
-    q: "你是否觉得失去对方后，自己的生活失去了意义？",
-    q_en: "Do you feel life has lost its meaning without them?",
-    options: [
-      { text: "完全符合 (Strongly Agree)", score: 4 },
-      { text: "部分符合 (Agree)", score: 3 },
-      { text: "不太符合 (Disagree)", score: 2 },
-      { text: "完全不符合 (Strongly Disagree)", score: 1 }
-    ]
-  },
-  // ... 此处省略 28 道类似结构的题目，我会为你整合在最终文件中
-];
-
-const Index = () => {
-  const [stage, setStage] = useState('hero');
-  const [currentQ, setCurrentQ] = useState(0);
-  const [totalScore, setTotalScore] = useState(0);
-  const [inputCode, setInputCode] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  // 进度记忆：已验证用户直接进入
-  useEffect(() => {
-    if (localStorage.getItem('dongliang_verified') === 'true') setStage('quiz');
-  }, []);
-
-  const handleVerify = async () => {
-    setLoading(true);
-    const { data } = await supabase.from('codes').select('*').eq('code_value', inputCode.trim()).eq('is_used', false).single();
-    if (data) {
-      await supabase.from('codes').update({ is_used: true }).eq('id', data.id);
-      localStorage.setItem('dongliang_verified', 'true');
-      setStage('quiz');
-    } else {
-      alert("验证码无效 | Invalid Code");
-    }
-    setLoading(false);
-  };
-
-  const handleAnswer = (score) => {
-    const nextScore = totalScore + score;
-    setTotalScore(nextScore);
-    if (currentQ < questions.length - 1) {
-      setCurrentQ(currentQ + 1);
-    } else {
-      setStage('result');
-    }
-  };
-
+export default function Index() {
   return (
-    <main className="min-h-screen bg-[#F5F2ED] p-6 flex flex-col items-center justify-center font-sans">
-      {stage === 'hero' && (
-        <div className="w-full max-w-md bg-white p-8 rounded-[32px] shadow-xl text-center border border-stone-100">
-          <h1 className="text-2xl font-bold text-[#4A3728] mb-2">分手自愈深度测评</h1>
-          <p className="text-gray-400 text-xs mb-8">Deep Post-Breakup Healing Assessment</p>
-          <input 
-            className="w-full bg-gray-50 p-4 rounded-xl mb-4 text-center outline-none border focus:border-[#A89F8E]"
-            placeholder="输入验证码 | Access Code"
-            value={inputCode}
-            onChange={(e) => setInputCode(e.target.value)}
-          />
-          <button onClick={handleVerify} className="w-full bg-[#A89F8E] text-white p-4 rounded-xl font-bold active:scale-95 transition-all">
-            {loading ? '验证中...' : '开始探索 | Start'}
-          </button>
-        </div>
-      )}
-
-      {stage === 'quiz' && (
-        <div className="w-full max-w-md bg-white p-8 rounded-[32px] shadow-sm">
-          <div className="mb-8">
-            <div className="h-1 w-full bg-gray-100 rounded-full mb-4">
-              <div className="h-full bg-[#A89F8E] rounded-full transition-all" style={{ width: `${((currentQ + 1) / questions.length) * 100}%` }}></div>
-            </div>
-            <p className="text-[#A89F8E] font-bold">Q{currentQ + 1}/{questions.length}</p>
-            <h2 className="text-xl font-bold text-[#4A3728] mt-2">{questions[currentQ].q}</h2>
-            <p className="text-gray-400 text-sm italic mt-1">{questions[currentQ].q_en}</p>
-          </div>
-          <div className="space-y-3">
-            {questions[currentQ].options.map((opt, i) => (
-              <button key={i} onClick={() => handleAnswer(opt.score)} className="w-full p-4 text-left border border-stone-100 rounded-2xl hover:bg-[#F5F2ED] active:bg-[#F5F2ED] transition-colors">
-                {opt.text}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {stage === 'result' && (
-        <div className="w-full max-w-md bg-white p-8 rounded-[32px] shadow-xl text-center">
-          <h2 className="text-2xl font-bold text-[#4A3728] mb-4">测评完成 | Completed</h2>
-          <div className="p-6 bg-[#F5F2ED] rounded-2xl mb-6">
-            <p className="text-sm text-gray-500 mb-1">自愈能量指数 | Healing Energy</p>
-            <p className="text-4xl font-black text-[#A89F8E]">{Math.round((1 - totalScore/(questions.length*4)) * 100)}%</p>
-          </div>
-          <p className="text-gray-600 leading-relaxed mb-6 text-sm">
-            这只是真相的开始。你可以截图此结果发给“东亮情感陪伴”，获取属于你的深度自愈方案。
-          </p>
-          <button onClick={() => window.location.reload()} className="text-[#A89F8E] font-bold underline">重新测试 | Retry</button>
-        </div>
-      )}
-      <div className="h-10" /> {/* 避让底栏 */}
-    </main>
+    <div className="min-h-screen bg-[#F5F2ED] flex items-center justify-center p-6">
+      <div className="bg-white p-10 rounded-[32px] shadow-xl text-center">
+        <h1 className="text-2xl font-bold text-[#4A3728]">东亮情感陪伴</h1>
+        <p className="mt-4 text-gray-500">双语测试系统正在维护，请稍后刷新。</p>
+        <p className="text-xs text-gray-400 mt-2">Bilingual System Updating...</p>
+      </div>
+    </div>
   );
-};
-
-export default Index;
+}
