@@ -1,227 +1,126 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+import React, { useState, useEffect } from 'react';
+import { createClient } from '@supabase/supabase-js';
 
-/* Therapeutic Healing Design System - Warm, Earthy, Calming */
+// 初始化 Supabase
+const supabaseUrl = 'https://uyqesonjopqgzwtxkchy.supabase.co';
+const supabaseKey = 'sb_publishable_M24zTkBimY0uhwL7d7S2MQ_zMWbSUSX';
+const supabase = createClient(supabaseUrl, supabaseKey);
 
-@layer base {
-  :root {
-    /* Warm beige background - like soft morning light */
-    --background: 35 30% 96%;
-    --foreground: 25 20% 20%;
+const questions = [
+  {
+    id: 1,
+    q: "你是否经常反复查看前任的社交媒体动态？",
+    q_en: "Do you frequently check your ex's social media updates?",
+    options: [
+      { text: "总是 (Always)", score: 4 },
+      { text: "经常 (Often)", score: 3 },
+      { text: "偶尔 (Sometimes)", score: 2 },
+      { text: "从不 (Never)", score: 1 }
+    ]
+  },
+  {
+    id: 2,
+    q: "你是否觉得失去对方后，自己的生活失去了意义？",
+    q_en: "Do you feel life has lost its meaning without them?",
+    options: [
+      { text: "完全符合 (Strongly Agree)", score: 4 },
+      { text: "部分符合 (Agree)", score: 3 },
+      { text: "不太符合 (Disagree)", score: 2 },
+      { text: "完全不符合 (Strongly Disagree)", score: 1 }
+    ]
+  },
+  // ... 此处省略 28 道类似结构的题目，我会为你整合在最终文件中
+];
 
-    /* Cream cards with subtle warmth */
-    --card: 38 40% 98%;
-    --card-foreground: 25 20% 20%;
+const Index = () => {
+  const [stage, setStage] = useState('hero');
+  const [currentQ, setCurrentQ] = useState(0);
+  const [totalScore, setTotalScore] = useState(0);
+  const [inputCode, setInputCode] = useState('');
+  const [loading, setLoading] = useState(false);
 
-    --popover: 38 40% 98%;
-    --popover-foreground: 25 20% 20%;
+  // 进度记忆：已验证用户直接进入
+  useEffect(() => {
+    if (localStorage.getItem('dongliang_verified') === 'true') setStage('quiz');
+  }, []);
 
-    /* Sage green #B2AC88 - healing, nature, growth */
-    --primary: 51 22% 62%;
-    --primary-foreground: 40 30% 98%;
+  const handleVerify = async () => {
+    setLoading(true);
+    const { data } = await supabase.from('codes').select('*').eq('code_value', inputCode.trim()).eq('is_used', false).single();
+    if (data) {
+      await supabase.from('codes').update({ is_used: true }).eq('id', data.id);
+      localStorage.setItem('dongliang_verified', 'true');
+      setStage('quiz');
+    } else {
+      alert("验证码无效 | Invalid Code");
+    }
+    setLoading(false);
+  };
 
-    /* Soft sand secondary */
-    --secondary: 35 25% 90%;
-    --secondary-foreground: 25 20% 25%;
+  const handleAnswer = (score) => {
+    const nextScore = totalScore + score;
+    setTotalScore(nextScore);
+    if (currentQ < questions.length - 1) {
+      setCurrentQ(currentQ + 1);
+    } else {
+      setStage('result');
+    }
+  };
 
-    /* Warm muted tones */
-    --muted: 35 20% 92%;
-    --muted-foreground: 25 15% 45%;
+  return (
+    <main className="min-h-screen bg-[#F5F2ED] p-6 flex flex-col items-center justify-center font-sans">
+      {stage === 'hero' && (
+        <div className="w-full max-w-md bg-white p-8 rounded-[32px] shadow-xl text-center border border-stone-100">
+          <h1 className="text-2xl font-bold text-[#4A3728] mb-2">分手自愈深度测评</h1>
+          <p className="text-gray-400 text-xs mb-8">Deep Post-Breakup Healing Assessment</p>
+          <input 
+            className="w-full bg-gray-50 p-4 rounded-xl mb-4 text-center outline-none border focus:border-[#A89F8E]"
+            placeholder="输入验证码 | Access Code"
+            value={inputCode}
+            onChange={(e) => setInputCode(e.target.value)}
+          />
+          <button onClick={handleVerify} className="w-full bg-[#A89F8E] text-white p-4 rounded-xl font-bold active:scale-95 transition-all">
+            {loading ? '验证中...' : '开始探索 | Start'}
+          </button>
+        </div>
+      )}
 
-    /* Soft terracotta #D6AD94 - warmth & comfort */
-    --accent: 23 44% 71%;
-    --accent-foreground: 40 30% 98%;
+      {stage === 'quiz' && (
+        <div className="w-full max-w-md bg-white p-8 rounded-[32px] shadow-sm">
+          <div className="mb-8">
+            <div className="h-1 w-full bg-gray-100 rounded-full mb-4">
+              <div className="h-full bg-[#A89F8E] rounded-full transition-all" style={{ width: `${((currentQ + 1) / questions.length) * 100}%` }}></div>
+            </div>
+            <p className="text-[#A89F8E] font-bold">Q{currentQ + 1}/{questions.length}</p>
+            <h2 className="text-xl font-bold text-[#4A3728] mt-2">{questions[currentQ].q}</h2>
+            <p className="text-gray-400 text-sm italic mt-1">{questions[currentQ].q_en}</p>
+          </div>
+          <div className="space-y-3">
+            {questions[currentQ].options.map((opt, i) => (
+              <button key={i} onClick={() => handleAnswer(opt.score)} className="w-full p-4 text-left border border-stone-100 rounded-2xl hover:bg-[#F5F2ED] active:bg-[#F5F2ED] transition-colors">
+                {opt.text}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
-    /* Gentle coral for highlights */
-    --highlight: 12 55% 72%;
-    --highlight-foreground: 25 20% 20%;
+      {stage === 'result' && (
+        <div className="w-full max-w-md bg-white p-8 rounded-[32px] shadow-xl text-center">
+          <h2 className="text-2xl font-bold text-[#4A3728] mb-4">测评完成 | Completed</h2>
+          <div className="p-6 bg-[#F5F2ED] rounded-2xl mb-6">
+            <p className="text-sm text-gray-500 mb-1">自愈能量指数 | Healing Energy</p>
+            <p className="text-4xl font-black text-[#A89F8E]">{Math.round((1 - totalScore/(questions.length*4)) * 100)}%</p>
+          </div>
+          <p className="text-gray-600 leading-relaxed mb-6 text-sm">
+            这只是真相的开始。你可以截图此结果发给“东亮情感陪伴”，获取属于你的深度自愈方案。
+          </p>
+          <button onClick={() => window.location.reload()} className="text-[#A89F8E] font-bold underline">重新测试 | Retry</button>
+        </div>
+      )}
+      <div className="h-10" /> {/* 避让底栏 */}
+    </main>
+  );
+};
 
-    /* Soft lavender for special states */
-    --lavender: 270 30% 85%;
-    --lavender-foreground: 270 25% 35%;
-
-    --destructive: 0 60% 55%;
-    --destructive-foreground: 40 30% 98%;
-
-    --border: 35 25% 88%;
-    --input: 35 25% 88%;
-    --ring: 51 22% 62%;
-
-    --radius: 1rem;
-
-    /* Glassmorphism */
-    --glass-bg: 38 40% 98% / 0.7;
-    --glass-border: 35 25% 88% / 0.5;
-    --glass-shadow: 25 20% 20% / 0.08;
-
-    /* Gradients */
-    --gradient-warm: linear-gradient(135deg, hsl(35 30% 96%), hsl(38 35% 94%));
-    --gradient-healing: linear-gradient(135deg, hsl(145 25% 92%), hsl(145 20% 88%));
-    --gradient-sunset: linear-gradient(135deg, hsl(15 45% 70%), hsl(25 50% 75%));
-    --gradient-card: linear-gradient(180deg, hsl(38 40% 99%), hsl(35 35% 96%));
-
-    /* Shadows */
-    --shadow-soft: 0 4px 20px -4px hsl(25 20% 20% / 0.08);
-    --shadow-glow: 0 0 30px -5px hsl(145 25% 42% / 0.2);
-    --shadow-warm: 0 8px 32px -8px hsl(15 45% 65% / 0.15);
-
-    --sidebar-background: 35 30% 96%;
-    --sidebar-foreground: 25 20% 25%;
-    --sidebar-primary: 51 22% 62%;
-    --sidebar-primary-foreground: 40 30% 98%;
-    --sidebar-accent: 35 25% 90%;
-    --sidebar-accent-foreground: 25 20% 25%;
-    --sidebar-border: 35 25% 88%;
-    --sidebar-ring: 51 22% 62%;
-  }
-
-  .dark {
-    --background: 25 15% 12%;
-    --foreground: 35 25% 92%;
-
-    --card: 25 15% 15%;
-    --card-foreground: 35 25% 92%;
-
-    --popover: 25 15% 15%;
-    --popover-foreground: 35 25% 92%;
-
-    --primary: 51 28% 55%;
-    --primary-foreground: 25 15% 10%;
-
-    --secondary: 25 12% 22%;
-    --secondary-foreground: 35 25% 90%;
-
-    --muted: 25 12% 20%;
-    --muted-foreground: 35 15% 60%;
-
-    --accent: 23 40% 60%;
-    --accent-foreground: 35 25% 95%;
-
-    --highlight: 12 45% 60%;
-    --highlight-foreground: 25 15% 10%;
-
-    --lavender: 270 25% 35%;
-    --lavender-foreground: 270 30% 85%;
-
-    --destructive: 0 55% 45%;
-    --destructive-foreground: 35 25% 95%;
-
-    --border: 25 12% 22%;
-    --input: 25 12% 22%;
-    --ring: 51 28% 55%;
-
-    --sidebar-background: 25 15% 12%;
-    --sidebar-foreground: 35 25% 90%;
-    --sidebar-primary: 51 28% 55%;
-    --sidebar-primary-foreground: 25 15% 10%;
-    --sidebar-accent: 25 12% 20%;
-    --sidebar-accent-foreground: 35 25% 90%;
-    --sidebar-border: 25 12% 22%;
-    --sidebar-ring: 51 28% 55%;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-
-  body {
-    @apply bg-background text-foreground antialiased;
-    font-feature-settings: "rlig" 1, "calt" 1;
-  }
-
-  /* Smooth scrolling */
-  html {
-    scroll-behavior: smooth;
-  }
-}
-
-@layer components {
-  /* Glassmorphism card */
-  .glass-card {
-    @apply bg-card/70 backdrop-blur-xl border border-border/50 rounded-2xl;
-    box-shadow: var(--shadow-soft);
-  }
-
-  /* Healing glow effect */
-  .healing-glow {
-    box-shadow: var(--shadow-glow);
-  }
-
-  /* Warm shadow */
-  .warm-shadow {
-    box-shadow: var(--shadow-warm);
-  }
-
-  /* Gradient backgrounds */
-  .bg-gradient-warm {
-    background: var(--gradient-warm);
-  }
-
-  .bg-gradient-healing {
-    background: var(--gradient-healing);
-  }
-
-  .bg-gradient-card {
-    background: var(--gradient-card);
-  }
-
-  /* Quiz option button */
-  .quiz-option {
-    @apply relative px-6 py-4 rounded-xl border-2 border-border bg-card/80 backdrop-blur-sm
-           transition-all duration-300 ease-out cursor-pointer
-           hover:border-primary/50 hover:bg-primary/5 hover:scale-[1.02]
-           active:scale-[0.98];
-  }
-
-  .quiz-option.selected {
-    @apply border-primary bg-primary/10 shadow-lg;
-    box-shadow: var(--shadow-glow);
-  }
-
-  /* Progress bar segment */
-  .progress-segment {
-    @apply h-1.5 rounded-full bg-muted transition-all duration-500 ease-out;
-  }
-
-  .progress-segment.active {
-    @apply bg-primary;
-  }
-
-  .progress-segment.completed {
-    @apply bg-primary;
-  }
-
-  /* Floating animation */
-  .float-gentle {
-    animation: floatGentle 6s ease-in-out infinite;
-  }
-
-  @keyframes floatGentle {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-  }
-
-  /* Pulse glow */
-  .pulse-glow {
-    animation: pulseGlow 2s ease-in-out infinite;
-  }
-
-  @keyframes pulseGlow {
-    0%, 100% { box-shadow: 0 0 20px -5px hsl(var(--primary) / 0.3); }
-    50% { box-shadow: 0 0 40px -5px hsl(var(--primary) / 0.5); }
-  }
-
-  /* Text gradient */
-  .text-gradient-warm {
-    @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--primary)));
-  }
-
-  /* Decorative blur circles */
-  .blur-circle {
-    @apply absolute rounded-full blur-3xl opacity-30 pointer-events-none;
-  }
-}
+export default Index;
