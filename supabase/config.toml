@@ -1,0 +1,10 @@
+project_id = "nrtcyblfsuklaighlojb"
+
+[functions.verify-code]
+verify_jwt = false
+
+[functions.generate-codes]
+verify_jwt = false
+
+[functions.list-codes]
+verify_jwt = false
